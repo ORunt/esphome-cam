@@ -1,0 +1,202 @@
+esphome:
+  name: loungelights
+  platform: ESP8266
+  board: esp12e
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Loungelights Fallback Hotspot"
+    password: !secret fallback_ap_pass
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_pass
+
+ota:
+  password: !secret ota_pass
+    
+output:
+  - platform: ac_dimmer
+    id: dimmer_lounge
+    gate_pin: GPIO13
+    method: leading
+    min_power: 0.3
+    zero_cross_pin:
+      number: GPIO12
+      mode: INPUT
+      inverted: yes
+  - platform: ac_dimmer
+    id: dimmer_entrance
+    gate_pin: GPIO14
+    method: leading
+    min_power: 0.3
+    zero_cross_pin:
+      number: GPIO12
+      mode: INPUT
+      inverted: yes
+  - platform: ac_dimmer
+    id: dimmer_high_light
+    gate_pin: GPIO16
+    method: leading
+    min_power: 0.3
+    zero_cross_pin:
+      number: GPIO12
+      mode: INPUT
+      inverted: yes
+
+light:
+  - platform: monochromatic
+    output: dimmer_lounge
+    id: lounge_light
+    name: "Lounge Light"
+    gamma_correct: 2.2
+  - platform: monochromatic
+    output: dimmer_entrance
+    id: entrance_light
+    name: "Entrance Light"
+    gamma_correct: 2.2
+  - platform: monochromatic
+    output: dimmer_high_light
+    id: high_light
+    name: "High Light"
+    gamma_correct: 2.2
+    
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: True
+    internal: True
+    name: "Touch Lounge Light"
+    id: binary_sensor_lounge
+    on_multi_click:
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at least 1s
+      then:
+        - logger.log: "Touch Lounge Light Double Clicked Long"
+        - while:
+            condition:
+              binary_sensor.is_on: binary_sensor_lounge
+            then:
+              - light.dim_relative:
+                  id: lounge_light
+                  relative_brightness: -5%
+                  transition_length: 0.2s
+              - delay: 0.2s
+    - timing:
+        - ON for at least 1s
+      then:
+        - logger.log: "Touch Lounge Light Single Clicked Long"
+        - while:
+            condition:
+              binary_sensor.is_on: binary_sensor_lounge
+            then:
+              - light.dim_relative:
+                  id: lounge_light
+                  relative_brightness: 5%
+                  transition_length: 0.2s
+              - delay: 0.2s
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 0.3s
+      then:
+        - logger.log: "Touch Lounge Light Single Clicked Short"
+        - light.toggle: lounge_light
+  - platform: gpio
+    pin:
+      number: GPIO4
+      mode: INPUT_PULLUP
+      inverted: True
+    internal: True
+    name: "Touch Entrance Light"
+    id: binary_sensor_entrance
+    on_multi_click:
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at least 1s
+      then:
+        - logger.log: "Touch Entrance Light Double Clicked Long"
+        - while:
+            condition:
+              binary_sensor.is_on: binary_sensor_entrance
+            then:
+              - light.dim_relative:
+                  id: entrance_light
+                  relative_brightness: -5%
+                  transition_length: 0.2s
+              - delay: 0.2s
+    - timing:
+        - ON for at least 1s
+      then:
+        - logger.log: "Touch Entrance Light Single Clicked Long"
+        - while:
+            condition:
+              binary_sensor.is_on: binary_sensor_entrance
+            then:
+              - light.dim_relative:
+                  id: entrance_light
+                  relative_brightness: 5%
+                  transition_length: 0.2s
+              - delay: 0.2s
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 0.3s
+      then:
+        - logger.log: "Touch Entrance Light Single Clicked Short"
+        - light.toggle: entrance_light
+  - platform: gpio
+    pin:
+      number: GPIO2
+      mode: INPUT_PULLUP
+      inverted: True
+    internal: True
+    name: "Touch High Light"
+    id: binary_sensor_high
+    on_multi_click:
+    - timing:
+        - ON for at most 1s
+        - OFF for at most 1s
+        - ON for at least 1s
+      then:
+        - logger.log: "Touch High Light Double Clicked Long"
+        - while:
+            condition:
+              binary_sensor.is_on: binary_sensor_high
+            then:
+              - light.dim_relative:
+                  id: high_light
+                  relative_brightness: -5%
+                  transition_length: 0.2s
+              - delay: 0.2s
+    - timing:
+        - ON for at least 1s
+      then:
+        - logger.log: "Touch High Light Single Clicked Long"
+        - while:
+            condition:
+              binary_sensor.is_on: binary_sensor_high
+            then:
+              - light.dim_relative:
+                  id: high_light
+                  relative_brightness: 5%
+                  transition_length: 0.2s
+              - delay: 0.2s
+    - timing:
+        - ON for at most 1s
+        - OFF for at least 0.3s
+      then:
+        - logger.log: "Touch High Light Single Clicked Short"
+        - light.toggle: high_light
