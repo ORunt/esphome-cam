@@ -2,6 +2,11 @@ esphome:
   name: loungelights
   platform: ESP8266
   board: esp12e
+  on_boot:
+    then:
+      - light.turn_on:
+          id: light_panel_light
+          brightness: 50%
 
 wifi:
   ssid: !secret wifi_ssid
@@ -27,7 +32,7 @@ ota:
 output:
   - platform: ac_dimmer
     id: dimmer_lounge
-    gate_pin: GPIO13
+    gate_pin: GPIO16
     method: leading
     min_power: 0.3
     zero_cross_pin:
@@ -45,13 +50,16 @@ output:
       inverted: yes
   - platform: ac_dimmer
     id: dimmer_high_light
-    gate_pin: GPIO16
+    gate_pin: GPIO13
     method: leading
     min_power: 0.3
     zero_cross_pin:
       number: GPIO12
       mode: INPUT
       inverted: yes
+  - platform: esp8266_pwm
+    id: panel_light
+    pin: GPIO15
 
 light:
   - platform: monochromatic
@@ -69,11 +77,15 @@ light:
     id: high_light
     name: "High Light"
     gamma_correct: 2.2
+  - platform: monochromatic
+    name: "Living Room Panel LED"
+    output: panel_light
+    id: light_panel_light
     
 binary_sensor:
   - platform: gpio
     pin:
-      number: GPIO5
+      number: GPIO2
       mode: INPUT_PULLUP
       inverted: True
     internal: True
@@ -159,7 +171,7 @@ binary_sensor:
         - light.toggle: entrance_light
   - platform: gpio
     pin:
-      number: GPIO2
+      number: GPIO5
       mode: INPUT_PULLUP
       inverted: True
     internal: True

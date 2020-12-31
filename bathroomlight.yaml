@@ -1,0 +1,77 @@
+esphome:
+  name: bathroomlights
+  platform: ESP8266
+  board: esp12e
+  on_boot:
+    then:
+      - light.turn_on:
+          id: light_panel_light
+          brightness: 50%
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Bathroomlights Fallback Hotspot"
+    password: !secret fallback_ap_pass
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_pass
+
+ota:
+  password: !secret ota_pass
+    
+binary_sensor:
+  - platform: gpio
+    id: button_bathroom_light
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    internal: True
+    on_press:
+      - light.toggle: light_bathroom_light
+  - platform: gpio
+    id: button_bathroom_fan
+    pin:
+      number: GPIO2
+      mode: INPUT_PULLUP
+      inverted: True
+    internal: True
+    on_press:
+      - fan.toggle: fan_bathroom_fan
+
+output:
+  - platform: gpio
+    id: output_bathroom_light
+    pin: GPIO4
+  - platform: gpio
+    id: output_bathroom_fan
+    pin: GPIO5
+  - platform: esp8266_pwm
+    id: panel_light
+    pin: GPIO15
+
+light:
+  - platform: binary
+    id: light_bathroom_light
+    name: "Bathroom Light"
+    output: output_bathroom_light
+  - platform: monochromatic
+    id: light_panel_light
+    name: "Bathroom Panel LED"
+    output: panel_light
+
+fan:
+  - platform: binary
+    id: fan_bathroom_fan
+    name: "Extractor Fan"
+    output: output_bathroom_fan
