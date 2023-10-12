@@ -19,10 +19,14 @@ substitutions:
   close_endstop_pin: GPIO14 # gpio pin for close endstop sensor
   debounce_time: 30ms # debounce time for open/close endstops
 
+  # addons (water meter)
+  reed_switch_pin: GPIO5
+
 packages:
   common: !include common/config_base.yaml
   wifi: !include common/wifi_base.yaml
   device_base: !include common/gate_base.yaml
+  device_addons: !include common/water_meter_base.yaml
 
 
 # Enable logging

@@ -1,0 +1,28 @@
+sensor:
+  - platform: pulse_counter
+    pin:
+      number: $reed_switch_pin
+      mode: INPUT
+      inverted: true
+    name: "Instant water consumption"
+    unit_of_measurement: "L/min"
+    update_interval: 60s
+    accuracy_decimals: 1
+    filters:
+      #- delayed_on_off: 800ms
+      #- debounce: 100ms
+      #- throttle: 800ms
+      - lambda: return (x / 2.0);
+      
+    total:
+      name: "Total water consumption"
+      unit_of_measurement: "m³"
+      device_class: water
+      state_class: total_increasing
+      accuracy_decimals: 3
+      filters:
+        - lambda: return (x / 2000.0);
+
+button:
+  - platform: restart
+    name: "Gate and Water Restart"
