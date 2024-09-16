@@ -2,6 +2,7 @@ esphome:
   name: bathroomlights
   platform: ESP8266
   board: esp12e
+#  arduino_version: espressif8266@2.2.3
   on_boot:
     then:
       - light.turn_on:
@@ -16,6 +17,11 @@ wifi:
   ap:
     ssid: "Bathroomlights Fallback Hotspot"
     password: !secret fallback_ap_pass
+
+  manual_ip:
+    static_ip: 192.168.0.104
+    gateway: 192.168.0.1
+    subnet: 255.255.255.0
 
 captive_portal:
 

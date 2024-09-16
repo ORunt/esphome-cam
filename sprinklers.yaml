@@ -1,0 +1,351 @@
+# Establish Substitutions
+substitutions:
+### Modify only the following 6 lines.
+  zone_1_name: Back Garden First Half
+  zone_2_name: Back Garden Second Half
+  zone_3_name: Front Garden First Half
+  zone_4_name: Front Garden Second Half
+  zone_5_name: Outside Verge
+
+  log_level: debug # Enable levels logging https://esphome.io/components/logger.html
+  # none, error, warn, info, debug (default), verbose, very_verbose
+
+  esphome_name: irrigation
+  esphome_platform: ESP8266
+  esphome_board: esp12e
+  esphome_comment: Twelve Valve Irrigation Control
+  upper_devicename: "Irrigation Controller"
+
+
+#Define Project Deatils and ESP Board Type
+esphome:
+  name: $esphome_name
+  platform: $esphome_platform
+  board: $esphome_board
+  comment: $esphome_comment
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_pass
+  power_save_mode: none
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Irrigation Fallback Hotspot"
+    password: !secret fallback_ap_pass
+
+  # manual_ip:
+    # static_ip: 192.168.0.104
+    # gateway: 192.168.0.1
+    # subnet: 255.255.255.0
+
+captive_portal:
+
+logger:
+  level: ${log_level}
+  logs:
+    text_sensor: WARN
+
+ota:
+  password: !secret ota_pass  
+
+# # Enable Web server.
+# web_server:
+#   port: 80
+
+# Sync time with Home Assistant.
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    
+###############################################
+# Enable Home Assistant API
+###############################################
+api:
+  password: !secret api_pass
+
+###############################################
+# GPIO Expander
+###############################################
+i2c:
+  sda: GPIO12
+  scl: GPIO13
+  scan: true
+  id: bus_a
+
+mcp23017:
+  - id: 'mcp23017_hub'
+    i2c_id: bus_a
+    address: 0x20
+
+  # pin:
+  #   mcp23xxx: mcp23017_hub
+  #   number: 0  # Use pin A0
+  #   number: 7  # Use pin A7
+  #   number: 8  # Use pin B0
+  #   number: 15 # Use pin B7
+  #   mode:
+  #     output: true
+  #   inverted: false
+
+
+###############################################
+# Binary Sensor.
+###############################################
+binary_sensor:
+  - platform: homeassistant
+    # prevent deep sleep - Needs further investigation on usefullness
+    id: prevent_deep_sleep
+    name: "$upper_devicename Prevent Deep Sleep"
+    entity_id: input_boolean.prevent_deep_sleep  
+
+####################################################
+# Hidden Binary Sensor for Water Level of the Tank
+####################################################
+  - platform: gpio
+    id: water_level_empty
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    internal: true
+  - platform: gpio
+    id: water_level_full
+    pin:
+      number: GPIO4
+      mode: INPUT_PULLUP
+      inverted: true
+    internal: true
+
+####################################################
+# Sensors that are exposed to front end.
+####################################################
+text_sensor:
+  - platform: template
+    name: "Water Level Sensor"
+    lambda: |-
+      if (id(water_level_empty).state) {
+        return {"Empty"};
+      } else if (id(water_level_full).state) {
+        return {"Full"};
+      } else {
+        return {"Partial"};
+      }
+    update_interval: 1s
+
+####################################################
+# Switch Control to restart the irrigation system.   
+####################################################
+switch:
+  - platform: restart
+    name: "Restart $upper_devicename"
+
+####################################################
+# Zones that are exposed to front end.
+####################################################
+  - platform: template
+    name: $zone_1_name
+    id: switch_zone_1
+    turn_on_action:
+      - switch.turn_on: switch_valve_1
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_1
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_2_name
+    id: switch_zone_2
+    turn_on_action:
+      - switch.turn_on: switch_valve_2
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_2
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_3_name
+    id: switch_zone_3
+    turn_on_action:
+      - switch.turn_on: switch_valve_3
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_3
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_4_name
+    id: switch_zone_4
+    turn_on_action:
+      - switch.turn_on: switch_valve_4
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_4
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_5_name
+    id: switch_zone_5
+    turn_on_action:
+      - switch.turn_on: switch_valve_5
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_5
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: "Fill Tank"
+    id: switch_fill_tank
+    turn_on_action:
+      - switch.turn_on: switch_valve_tank_out
+      - switch.turn_on: switch_valve_well_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_tank_out
+      - switch.turn_off: switch_valve_well_in
+    optimistic: True
+
+####################################################
+# Hidden I/O  Switches to control irrigation valve relays
+####################################################
+  - platform: gpio
+    id: switch_pump
+    name: "Pump"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 0  # Use pin A0
+    internal: true
+  - platform: gpio
+    id: switch_valve_tank_in
+    name: "Tank Input Valve"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 1  # Use pin A1
+    internal: true
+  - platform: gpio
+    id: switch_valve_tank_out
+    name: "Tank Output Valve"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 2  # Use pin A2
+    internal: true
+  - platform: gpio
+    id: switch_valve_well_in
+    name: "Well Input Valve"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 3  # Use pin A3
+    internal: true
+  - platform: gpio
+    id: switch_valve_1
+    name: "Valve 1"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 4  # Use pin A4
+    internal: true
+  - platform: gpio
+    id: switch_valve_2
+    name: "Valve 2"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 5  # Use pin A5
+    internal: true
+  - platform: gpio
+    id: switch_valve_3
+    name: "Valve 3"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 6  # Use pin A6
+    internal: true
+  - platform: gpio
+    id: switch_valve_4
+    name: "Valve 4"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 7  # Use pin A7
+    internal: true
+  - platform: gpio
+    id: switch_valve_5
+    name: "Valve 5"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 9  # Use pin B1
+    internal: true
+  - platform: gpio
+    id: switch_valve_6
+    name: "Valve 6"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 8  # Use pin B0
+    internal: true
+
+  - platform: gpio
+    id: switch_valve_7
+    name: "Valve 7"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 10  # Use pin B2
+    internal: true
+  - platform: gpio
+    id: switch_valve_8
+    name: "Valve 8"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 11  # Use pin B3
+    internal: true
+  - platform: gpio
+    id: switch_valve_9
+    name: "Valve 9"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 12  # Use pin B4
+    internal: true
+  - platform: gpio
+    id: switch_valve_10
+    name: "Valve 10"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 13  # Use pin B5
+    internal: true
+  - platform: gpio
+    id: switch_valve_11
+    name: "Valve 11"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 14  # Use pin B6
+    internal: true
+  - platform: gpio
+    id: switch_valve_12
+    name: "Valve 12"
+    pin:
+      mcp23xxx: mcp23017_hub
+      number: 15  # Use pin B7
+    internal: true

@@ -30,9 +30,10 @@ api:
 ota:
   password: !secret ota_pass
 
-uart:
-  tx_pin: GPIO1
-  baud_rate: 9600
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  scan: False
     
 output:
   - platform: template
@@ -40,9 +41,25 @@ output:
     type: float
     min_power: 0.2
     write_action:
-      - uart.write: !lambda |-
+      - i2c.write: !lambda |-
             auto val = (byte)(int)(state * 100);
-            return { 0xA0, 0x00, val };
+            return { 0x6A, 0x00, val };
+  - platform: template
+    id: dimmer_roof
+    type: float
+    min_power: 0.2
+    write_action:
+      - i2c.write: !lambda |-
+            auto val = (byte)(int)(state * 100);
+            return { 0x6A, 0x01, val };
+  - platform: template
+    id: dimmer_roopert
+    type: float
+    min_power: 0.2
+    write_action:
+      - i2c.write: !lambda |-
+            auto val = (byte)(int)(state * 100);
+            return { 0x6A, 0x02, val };
   - platform: esp8266_pwm
     id: panel_light
     pin: GPIO15
@@ -52,6 +69,16 @@ light:
     output: dimmer_bedroom
     id: bedroom_light
     name: "Cellar Light"
+    gamma_correct: 2.2
+  - platform: monochromatic
+    output: dimmer_roof
+    id: roof_light
+    name: "Rooftop Light"
+    gamma_correct: 2.2
+  - platform: monochromatic
+    output: dimmer_roopert
+    id: roopert_light
+    name: "Ruperts Light"
     gamma_correct: 2.2
   - platform: monochromatic
     name: "Cellar Panel LED"

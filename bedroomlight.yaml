@@ -1,3 +1,4 @@
+# From GIT ID: [1f5c79b]
 esphome:
   name: bedroomlights
   platform: ESP8266
@@ -6,7 +7,7 @@ esphome:
     then:
       - light.turn_on:
           id: light_panel_light
-          brightness: 50%
+          brightness: 25%
 
 wifi:
   ssid: !secret wifi_ssid
@@ -17,10 +18,16 @@ wifi:
     ssid: "Bedroomlights Fallback Hotspot"
     password: !secret fallback_ap_pass
 
+  # manual_ip:
+    # static_ip: 192.168.0.102
+    # gateway: 192.168.0.1
+    # subnet: 255.255.255.0
+
 captive_portal:
 
 # Enable logging
 logger:
+  baud_rate: 0
 
 # Enable Home Assistant API
 api:
@@ -28,17 +35,21 @@ api:
 
 ota:
   password: !secret ota_pass
+
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  scan: False
     
 output:
-  - platform: ac_dimmer
+  - platform: template
     id: dimmer_bedroom
-    gate_pin: GPIO14
-    method: leading
-    min_power: 0.3
-    zero_cross_pin:
-      number: GPIO13
-      mode: INPUT
-      inverted: yes
+    type: float
+    min_power: 0.2
+    write_action:
+      - i2c.write: !lambda |-
+            auto val = (byte)(int)(state * 100);
+            return { 0x6A, 0x00, val };
   - platform: esp8266_pwm
     id: panel_light
     pin: GPIO15

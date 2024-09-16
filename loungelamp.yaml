@@ -2,6 +2,7 @@ esphome:
   name: loungelamp
   platform: ESP8266
   board: esp12e
+  # arduino_version: espressif8266@2.2.3
 
 wifi:
   ssid: !secret wifi_ssid
@@ -11,6 +12,13 @@ wifi:
   ap:
     ssid: "Lounge Lamp Fallback Hotspot"
     password: !secret fallback_ap_pass
+
+  manual_ip:
+    static_ip: 192.168.0.103
+    gateway: 192.168.0.1
+    subnet: 255.255.255.0
+#    dns1: 198.162.1.64
+#    dns2: 198.162.1.250
 
 captive_portal:
 

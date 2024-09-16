@@ -1,23 +1,21 @@
 esphome:
-  name: fishpondswitch
+  name: fountainswitch
   platform: ESP8266
   board: esp12e
 #  arduino_version: espressif8266@2.2.3
-  on_boot:
-    then:
-      - switch.turn_on:
-          id: switch_fishpond_pump
-      - switch.turn_on:
-          id: switch_fishpond_light
+  # on_boot:
+    # then:
+      # - switch.turn_off:
+          # id: switch_fountain
 
 wifi:
-  ssid: !secret wifi_ssid_2
+  ssid: !secret wifi_ssid
   password: !secret wifi_pass
   power_save_mode: none
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Fishpondswitch Fallback Hotspot"
+    ssid: "Fountainswitch Fallback Hotspot"
     password: !secret fallback_ap_pass
 
   # manual_ip:
@@ -39,21 +37,17 @@ ota:
 
 switch:
   - platform: gpio
-    id: switch_fishpond_pump
-    name: "Fishpond Pump"
-    pin: GPIO12
-  - platform: gpio
-    id: switch_fishpond_light
-    name: "Fishpond UV Light"
-    pin: GPIO14
+    id: switch_fountain
+    name: "Fountain"
+    pin: GPIO4
     
 binary_sensor:
   - platform: gpio
-    id: button_fishpond_pump
+    id: button_fountain
     pin:
       number: GPIO5
       mode: INPUT_PULLUP
       inverted: True
     internal: True
     on_state:
-      - switch.toggle: switch_fishpond_pump
+      - switch.toggle: switch_fountain
