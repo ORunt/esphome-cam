@@ -3,9 +3,9 @@ substitutions:
 ### Modify only the following 6 lines.
   zone_1_name: Back Garden First Half
   zone_2_name: Back Garden Second Half
-  zone_3_name: Front Garden First Half
-  zone_4_name: Front Garden Second Half
-  zone_5_name: Outside Verge
+  zone_3_name: Outside Verge
+  zone_4_name: Front Garden First Half
+  zone_5_name: Front Garden Second Half
 
   log_level: debug # Enable levels logging https://esphome.io/components/logger.html
   # none, error, warn, info, debug (default), verbose, very_verbose
@@ -116,6 +116,12 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: true
     internal: true
+  - platform: gpio
+    id: float_level_full
+    pin:
+      number: GPIO2
+      inverted: false
+    internal: true
 
 ####################################################
 # Sensors that are exposed to front end.
@@ -127,6 +133,15 @@ text_sensor:
       if (id(water_level_empty).state) {
         return {"Empty"};
       } else if (id(water_level_full).state) {
+        return {"Full"};
+      } else {
+        return {"Partial"};
+      }
+    update_interval: 1s
+  - platform: template
+    name: "Float Level Sensor"
+    lambda: |-
+      if (id(float_level_full).state) {
         return {"Full"};
       } else {
         return {"Partial"};
@@ -231,6 +246,97 @@ switch:
       - delay: 3s
       - switch.turn_off: switch_valve_tank_out
       - switch.turn_off: switch_valve_well_in
+    optimistic: True
+
+# ~ Test the Orbit valves ~
+  - platform: template
+    name: "Test Orbit 3"
+    id: switch_test_orbit_3
+    turn_on_action:
+      - switch.turn_on: switch_valve_3
+    turn_off_action:
+      - switch.turn_off: switch_valve_3
+    optimistic: True
+  - platform: template
+    name: "Test Orbit 4"
+    id: switch_test_orbit_4
+    turn_on_action:
+      - switch.turn_on: switch_valve_4
+    turn_off_action:
+      - switch.turn_off: switch_valve_4
+    optimistic: True
+  - platform: template
+    name: "Test Orbit 5"
+    id: switch_test_orbit_5
+    turn_on_action:
+      - switch.turn_on: switch_valve_5
+    turn_off_action:
+      - switch.turn_off: switch_valve_5
+    optimistic: True
+  - platform: template
+    name: "Test Orbit Well"
+    id: switch_test_orbit_well
+    turn_on_action:
+      - switch.turn_on: switch_valve_well_in
+    turn_off_action:
+      - switch.turn_off: switch_valve_well_in
+    optimistic: True
+  - platform: template
+    name: "Test Hunter Tank Out"
+    id: switch_test_tank_out
+    turn_on_action:
+      - switch.turn_on: switch_valve_tank_out
+    turn_off_action:
+      - switch.turn_off: switch_valve_tank_out
+    optimistic: True
+  - platform: template
+    name: "Test Hunter Tank in"
+    id: switch_test_tank_in
+    turn_on_action:
+      - switch.turn_on: switch_valve_tank_in
+    turn_off_action:
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+# Municipal Valves
+  - platform: template
+    name: "Test Municipal Valve 1"
+    id: switch_municpal_1
+    turn_on_action:
+      - switch.turn_on: switch_valve_7
+    turn_off_action:
+      - switch.turn_off: switch_valve_7
+    optimistic: True
+  - platform: template
+    name: "Test Municipal Valve 2"
+    id: switch_municpal_2
+    turn_on_action:
+      - switch.turn_on: switch_valve_8
+    turn_off_action:
+      - switch.turn_off: switch_valve_8
+    optimistic: True
+  - platform: template
+    name: "Test Municipal Valve 3"
+    id: switch_municpal_3
+    turn_on_action:
+      - switch.turn_on: switch_valve_9
+    turn_off_action:
+      - switch.turn_off: switch_valve_9
+    optimistic: True
+  - platform: template
+    name: "Test Municipal Valve 4"
+    id: switch_municpal_4
+    turn_on_action:
+      - switch.turn_on: switch_valve_10
+    turn_off_action:
+      - switch.turn_off: switch_valve_10
+    optimistic: True
+  - platform: template
+    name: "Test Municipal Valve 5"
+    id: switch_municpal_5
+    turn_on_action:
+      - switch.turn_on: switch_valve_11
+    turn_off_action:
+      - switch.turn_off: switch_valve_11
     optimistic: True
 
 ####################################################
