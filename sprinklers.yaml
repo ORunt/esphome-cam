@@ -6,6 +6,13 @@ substitutions:
   zone_3_name: Outside Verge
   zone_4_name: Front Garden First Half
   zone_5_name: Front Garden Second Half
+  zone_6_name: Garage Edge
+  zone_7_name: Side Doors Edge
+  zone_8_name: Back Doors Edge
+  zone_9_name: Fish Pond Edge
+  zone_10_name: Back Yard Perimeter
+  zone_dual_1_name: Garage and Side Doors Dual
+  zone_dual_2_name: Back Doors and Fish Pond Dual
 
   log_level: debug # Enable levels logging https://esphome.io/components/logger.html
   # none, error, warn, info, debug (default), verbose, very_verbose
@@ -234,6 +241,115 @@ switch:
     optimistic: True
 
   - platform: template
+    name: $zone_6_name
+    id: switch_zone_6
+    turn_on_action:
+      - switch.turn_on: switch_valve_6
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_6
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_7_name
+    id: switch_zone_7
+    turn_on_action:
+      - switch.turn_on: switch_valve_7
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_7
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_8_name
+    id: switch_zone_8
+    turn_on_action:
+      - switch.turn_on: switch_valve_8
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_8
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_9_name
+    id: switch_zone_9
+    turn_on_action:
+      - switch.turn_on: switch_valve_9
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_9
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_10_name
+    id: switch_zone_10
+    turn_on_action:
+      - switch.turn_on: switch_valve_10
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_10
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_dual_1_name
+    id: switch_zone_dual_1
+    turn_on_action:
+      - switch.turn_on: switch_valve_6
+      - switch.turn_on: switch_valve_7
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_6
+      - switch.turn_off: switch_valve_7
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
+    name: $zone_dual_2_name
+    id: switch_zone_dual_2
+    turn_on_action:
+      - switch.turn_on: switch_valve_8
+      - switch.turn_on: switch_valve_9
+      - switch.turn_on: switch_valve_tank_in
+      - delay: 3s
+      - switch.turn_on: switch_pump
+    turn_off_action:
+      - switch.turn_off: switch_pump
+      - delay: 3s
+      - switch.turn_off: switch_valve_8
+      - switch.turn_off: switch_valve_9
+      - switch.turn_off: switch_valve_tank_in
+    optimistic: True
+
+  - platform: template
     name: "Fill Tank"
     id: switch_fill_tank
     turn_on_action:
@@ -297,46 +413,47 @@ switch:
     turn_off_action:
       - switch.turn_off: switch_valve_tank_in
     optimistic: True
-# Municipal Valves
+
+    # Municipal Valves
   - platform: template
     name: "Test Municipal Valve 1"
     id: switch_municpal_1
+    turn_on_action:
+      - switch.turn_on: switch_valve_6
+    turn_off_action:
+      - switch.turn_off: switch_valve_6
+    optimistic: True
+  - platform: template
+    name: "Test Municipal Valve 2"
+    id: switch_municpal_2
     turn_on_action:
       - switch.turn_on: switch_valve_7
     turn_off_action:
       - switch.turn_off: switch_valve_7
     optimistic: True
   - platform: template
-    name: "Test Municipal Valve 2"
-    id: switch_municpal_2
+    name: "Test Municipal Valve 3"
+    id: switch_municpal_3
     turn_on_action:
       - switch.turn_on: switch_valve_8
     turn_off_action:
       - switch.turn_off: switch_valve_8
     optimistic: True
   - platform: template
-    name: "Test Municipal Valve 3"
-    id: switch_municpal_3
+    name: "Test Municipal Valve 4"
+    id: switch_municpal_4
     turn_on_action:
       - switch.turn_on: switch_valve_9
     turn_off_action:
       - switch.turn_off: switch_valve_9
     optimistic: True
   - platform: template
-    name: "Test Municipal Valve 4"
-    id: switch_municpal_4
+    name: "Test Municipal Valve 5"
+    id: switch_municpal_5
     turn_on_action:
       - switch.turn_on: switch_valve_10
     turn_off_action:
       - switch.turn_off: switch_valve_10
-    optimistic: True
-  - platform: template
-    name: "Test Municipal Valve 5"
-    id: switch_municpal_5
-    turn_on_action:
-      - switch.turn_on: switch_valve_11
-    turn_off_action:
-      - switch.turn_off: switch_valve_11
     optimistic: True
 
 ####################################################
@@ -419,6 +536,7 @@ switch:
     pin:
       mcp23xxx: mcp23017_hub
       number: 10  # Use pin B2
+      inverted: true
     internal: true
   - platform: gpio
     id: switch_valve_8
@@ -426,6 +544,7 @@ switch:
     pin:
       mcp23xxx: mcp23017_hub
       number: 11  # Use pin B3
+      inverted: true
     internal: true
   - platform: gpio
     id: switch_valve_9
@@ -433,6 +552,7 @@ switch:
     pin:
       mcp23xxx: mcp23017_hub
       number: 12  # Use pin B4
+      inverted: true
     internal: true
   - platform: gpio
     id: switch_valve_10
@@ -440,6 +560,7 @@ switch:
     pin:
       mcp23xxx: mcp23017_hub
       number: 13  # Use pin B5
+      inverted: true
     internal: true
   - platform: gpio
     id: switch_valve_11
