@@ -11,6 +11,8 @@ substitutions:
   zone_8_name: Back Doors Edge
   zone_9_name: Fish Pond Edge
   zone_10_name: Back Yard Perimeter
+  zone_11_name: Front Garden Flowers
+  zone_12_name: Front Garden Shrubs
   zone_dual_1_name: Garage and Side Doors Dual
   zone_dual_2_name: Back Doors and Fish Pond Dual
 
@@ -314,6 +316,16 @@ switch:
       - switch.turn_off: switch_valve_10
       - switch.turn_off: switch_valve_tank_in
     optimistic: True
+
+  - platform: gpio
+    name: $zone_11_name
+    id: switch_zone_11
+    pin: GPIO16
+    
+  - platform: gpio
+    name: $zone_12_name
+    id: switch_zone_12
+    pin: GPIO14
 
   - platform: template
     name: $zone_dual_1_name
