@@ -317,15 +317,33 @@ switch:
       - switch.turn_off: switch_valve_tank_in
     optimistic: True
 
-  - platform: gpio
+  - platform: template
     name: $zone_11_name
     id: switch_zone_11
-    pin: GPIO16
-    
-  - platform: gpio
+    turn_on_action:
+      - switch.turn_on: switch_valve_11
+    turn_off_action:
+      - switch.turn_off: switch_valve_11
+    optimistic: True
+
+  - platform: template
     name: $zone_12_name
     id: switch_zone_12
-    pin: GPIO14
+    turn_on_action:
+      - switch.turn_on: switch_valve_12
+    turn_off_action:
+      - switch.turn_off: switch_valve_12
+    optimistic: True
+
+  # - platform: gpio
+  #   name: $zone_13_name
+  #   id: switch_zone_13
+  #   pin: GPIO16
+    
+  # - platform: gpio
+  #   name: $zone_14_name
+  #   id: switch_zone_14
+  #   pin: GPIO14
 
   - platform: template
     name: $zone_dual_1_name
